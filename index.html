@@ -8,14 +8,15 @@
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #000000;
+            color: #fff;
             text-align: center;
             padding: 20px;
         }
         .container {
             background-color: #4b0082;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             max-width: 700px;
             margin: auto;
         }
@@ -23,12 +24,12 @@
             margin: 15px 0;
             padding: 12px;
             width: calc(100% - 24px);
-            border-radius: 5px;
+            border-radius: 10px;
             border: 1px solid #ccc;
             font-size: 16px;
         }
         button {
-            background-color: #000;
+            background-color: #000000;
             color: white;
             cursor: pointer;
             font-size: 18px;
@@ -36,43 +37,48 @@
         button:hover {
             background-color: #4fc600;
         }
-        h1{
+        h1 {
             color: #ffffff;
             font-size: 36px;
             font-weight: bold;
         }
-        h2{
+        h2 {
             color: #ffffff;
             font-size: 24px;
         }
-        .logo img{
-            width: 15px;
+        .logo img {
+            width: 150px;
             margin-bottom: 20px;
-
+        }
+        label{
+            color: #ffffff;
+            display: block;
+            margin: 10px 0 5px;
         }
         #resultado {
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
             font-size: 20px;
-            color:#ffffff;
+            color: #ffffff;
             margin-top: 20px;
         }
         #resultado.show{
             opacity: 1;
         }
         .erro {
-            color: rgb(255, 170, 0);
+            color: rgb(255, 149, 0);
         }
         @media (max-width: 600px){
-            input, select, bottom{
+            input, select, button{
                 width: 100%;
                 padding: 10px;
                 font-size: 14px;
             }
-            h1{
+
+            h1 {
                 font-size: 28px;
             }
-            h2{
+            h2 {
                 font-size: 20px;
             }
         }
@@ -80,9 +86,6 @@
 </head>
 <body>
     <div class="container">
-        <div class="logo">
-            <img src="logo.png" alt>
-        </div>
         <h1>Conversor de Números</h1>
         <h2>Escolha uma conversão</h2>
         <select id="conversaoTipo">
@@ -101,6 +104,7 @@
         </select>
 
         <input type="text" id="inputNumero" placeholder="Digite o número">
+
         <button onclick="realizarConversao()">Converter</button>
         
         <div id="resultado"></div>
@@ -111,14 +115,11 @@
         function decimalParaBinario(n) {
             let numero = [];
             let i = parseInt(n);
-            while (true) {
+            while (i > 0) {
                 numero.push(i % 2);
-                if (i === 0) break;
                 i = Math.floor(i / 2);
             }
-            if (numero.length <= 2) numero.push(0);
-            if (numero.length >= 4 && numero[numero.length - 1] === 0) numero.pop();
-            return numero.reverse().join('');
+            return numero.length ? numero.reverse().join('') : '0';
         }
 
         function binarioParaDecimal(a) {
@@ -138,7 +139,7 @@
                 resto.push(o % 8);
                 o = Math.floor(o / 8);
             }
-            return resto.reverse().join('');
+            return resto.reverse().join('') || '0';
         }
 
         function decimalParaHexadecimal(h) {
@@ -148,7 +149,7 @@
                 resto.push(r >= 10 ? String.fromCharCode(65 + (r - 10)) : r);
                 h = Math.floor(h / 16);
             }
-            return resto.reverse().join('');
+            return resto.reverse().join('') || '0';
         }
 
         function octalParaDecimal(o) {
@@ -212,9 +213,15 @@
 
         function realizarConversao() {
             const tipo = parseInt(document.getElementById("conversaoTipo").value);
-            const input = document.getElementById("inputNumero").value.trim();
+            let input = document.getElementById("inputNumero").value.trim();
             let erro = validarNumero(input, tipo);
             let resultado = '';
+
+            if (!input) {
+                document.getElementById("erro").innerText = 'Por favor, digite um número.';
+                document.getElementById("resultado").innerText = '';
+                return;
+            }
 
             if (erro) {
                 document.getElementById("erro").innerText = erro;
@@ -241,6 +248,7 @@
             }
 
             document.getElementById("resultado").innerText = `Resultado: ${resultado}`;
+            document.getElementById("resultado").style.opacity = 1;  // Mostra o resultado
         }
     </script>
 </body>
