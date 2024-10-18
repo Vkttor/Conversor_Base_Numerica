@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor de Números e Bases</title>
+    <title>Conversor de Números - JS</title>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #000000;
+            background-color: #000;
+            color: #fff;
             text-align: center;
             padding: 20px;
         }
@@ -16,11 +17,10 @@
             background-color: #4b0082;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             max-width: 700px;
             margin: auto;
         }
-
         input, select, button {
             margin: 15px 0;
             padding: 12px;
@@ -29,63 +29,58 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
-
         button {
             background-color: #000000;
             color: white;
             cursor: pointer;
             font-size: 18px;
         }
-
         button:hover {
             background-color: #4fc600;
         }
-
         h1 {
             color: #ffffff;
             font-size: 36px;
-            font-weight: bold;
+            font-weight: bold; 
         }
-
-        h2 {
+        h2 {            
             color: #ffffff;
             font-size: 24px;
+            
         }
-
-        .logo img {
-            width: 150px;
+        .logo img{
+            width: 150;
             margin-bottom: 20px;
         }
-
-        label {
-            color: #ffffff;
+        label{
+            color:#ffffff;
             display: block;
             margin: 10px 0 5px;
         }
-
         #resultado {
             opacity: 0;
             transition: opacity 0.3s ease-in-out;
-            font-size: 20px;
-            color: #ffffff;
             margin-top: 20px;
+            font-size: 20px;
         }
-
-        #resultado.show {
+        #resultado.show{
             opacity: 1;
         }
-
-        @media (max-width: 600px) {
-            input, select, button {
+        .erro {
+            color: rgb(255, 174, 0);
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        @media (max-width: 600px){
+            input, select, button{
                 width: 100%;
                 padding: 10px;
                 font-size: 14px;
             }
-
             h1 {
                 font-size: 28px;
             }
-
             h2 {
                 font-size: 20px;
             }
@@ -98,8 +93,8 @@
             <img src="logo.png" alt>
         </div>
         <h1>Conversor de Números</h1>
-        <h2>Selecione uma Conversão</h2>
-        
+        <h2>Escolha uma conversão</h2>
+
         <select id="conversaoTipo">
             <option value="0">Decimal para Binário</option>
             <option value="1">Decimal para Octal</option>
@@ -115,28 +110,39 @@
             <option value="11">Hexadecimal para Octal</option>
         </select>
 
-        <label for="inputNumber">Digite o número:</label>
-        <input type="text" id="inputNumber">
-
+        <input type="text" id="inputNumero" placeholder="Digite o número">
         <button onclick="realizarConversao()">Converter</button>
-
-        <h2 id="resultado"></h2>
+        
+        <div id="resultado"></div>
+        <div id="erro" class="erro"></div>
     </div>
-    
+
     <script>
-        //funções de conversão
-        //decimal
-        function decimalBinario(n) {
+        function decimalParaBinario(n) {
             let numero = [];
             let i = parseInt(n);
-            while (i > 0) {
+            while (true) {
                 numero.push(i % 2);
+                if (i === 0) break;
                 i = Math.floor(i / 2);
             }
-            return numero.length === 0 ? '0' : numero.reverse().join('');
+            if (numero.length <= 2) numero.push(0);
+            if (numero.length >= 4 && numero[numero.length - 1] === 0) numero.pop();
+            return numero.reverse().join('');
         }
 
-        function decimalOctal(o) {
+        function binarioParaDecimal(a) {
+            let valor = 0;
+            let cont = 0;
+            for (let i = a.length - 1; i >= 0; i--) {
+                let numero = parseInt(a[i]);
+                valor += numero * Math.pow(2, cont);
+                cont++;
+            }
+            return valor;
+        }
+
+        function decimalParaOctal(o) {
             let resto = [];
             while (o > 0) {
                 resto.push(o % 8);
@@ -145,109 +151,106 @@
             return resto.reverse().join('');
         }
 
-        function decimalHexadecimal(h) {
+        function decimalParaHexadecimal(h) {
             let resto = [];
             while (h > 0) {
-                resto.push(converteHexadecimal(h % 16));
+                let r = h % 16;
+                resto.push(r >= 10 ? String.fromCharCode(65 + (r - 10)) : r);
                 h = Math.floor(h / 16);
             }
             return resto.reverse().join('');
         }
 
-        //binário
-        function binarioDecimal(b) {
+        function octalParaDecimal(o) {
             let valor = 0;
-            for (let i = 0; i < b.length; i++) {
-                valor = valor * 2 + (b[i] === '1' ? 1 : 0);
+            let cont = 0;
+            for (let i = o.length - 1; i >= 0; i--) {
+                valor += parseInt(o[i]) * Math.pow(8, cont);
+                cont++;
             }
             return valor;
         }
 
-        function binarioParaOctal(b) {
-            let decimal = binarioDecimal(b);
-            return decimalOctal(decimal);
-        }
-
-        function binarioParaHexadecimal(b) {
-            let decimal = binarioDecimal(b);
-            return decimalHexadecimal(decimal);
-        }
-
-        //octal
-        function octalDecimal(o) {
+        function hexadecimalParaDecimal(h) {
             let valor = 0;
-            for (let i = 0; i < o.length; i++) {
-                valor = valor * 8 + parseInt(o[i]);
+            let cont = 0;
+            for (let i = h.length - 1; i >= 0; i--) {
+                let n = h[i].toUpperCase();
+                n = (n >= 'A' && n <= 'F') ? n.charCodeAt(0) - 55 : parseInt(n);
+                valor += n * Math.pow(16, cont);
+                cont++;
             }
             return valor;
         }
 
-        function octalParaBinario(o) {
-            let decimal = octalDecimal(o);
-            return decimalBinario(decimal);
-        }
-
-        function octalParaHexadecimal(o) {
-            let decimal = octalDecimal(o);
-            return decimalHexadecimal(decimal);
-        }
-
-        //hexadecimal
-        function hexadecimalDecimal(h) {
-            let valor = 0;
-            for (let i = 0; i < h.length; i++) {
-                valor = valor * 16 + converteHexadecimalDecimal(h[i]);
+        function validarNumero(input, tipo) {
+            let erro = "";
+            switch (tipo) {
+                case 0:
+                case 1:
+                case 2:
+                    if (!/^\d+$/.test(input)) {
+                        erro = "Digite um número decimal válido.";
+                    }
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    if (!/^[01]+$/.test(input)) {
+                        erro = "Digite um número binário válido (somente 0 e 1).";
+                    }
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                    if (!/^[0-7]+$/.test(input)) {
+                        erro = "Digite um número octal válido (somente dígitos de 0 a 7).";
+                    }
+                    break;
+                case 9:
+                case 10:
+                case 11:
+                    if (!/^[0-9A-Fa-f]+$/.test(input)) {
+                        erro = "Digite um número hexadecimal válido (0-9, A-F).";
+                    }
+                    break;
+                default:
+                    erro = "Conversão inválida.";
             }
-            return valor;
+            return erro;
         }
 
-        function hexadecimalParaBinário(h) {
-            let decimal = hexadecimalDecimal(h);
-            return decimalBinario(decimal);
-        }
-
-        function hexadecimalParaOctal(h) {
-            let decimal = hexadecimalDecimal(h);
-            return decimalOctal(decimal);
-        }
-
-        //conversão de caracteres
-        function converteHexadecimal(valor) {
-            if (valor < 10) return valor;
-            return String.fromCharCode('A'.charCodeAt(0) + (valor - 10));
-        }
-
-        function converteHexadecimalDecimal(char) {
-            if (char >= '0' && char <= '9') {
-                return parseInt(char);
-            }
-            return char.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
-        }
-
-        //função principal
         function realizarConversao() {
-            const tipoConversao = document.getElementById('conversaoTipo').value;
-            const inputNumber = document.getElementById('inputNumber').value.trim().toUpperCase();
+            const tipo = parseInt(document.getElementById("conversaoTipo").value);
+            const input = document.getElementById("inputNumero").value.trim();
+            let erro = validarNumero(input, tipo);
             let resultado = '';
 
-            switch (parseInt(tipoConversao)) {
-                case 0: resultado = decimalBinario(inputNumber); break;
-                case 1: resultado = decimalOctal(inputNumber); break;
-                case 2: resultado = decimalHexadecimal(inputNumber); break;
-                case 3: resultado = binarioDecimal(inputNumber); break;
-                case 4: resultado = binarioParaOctal(inputNumber); break;
-                case 5: resultado = binarioParaHexadecimal(inputNumber); break;
-                case 6: resultado = octalDecimal(inputNumber); break; 
-                case 7: resultado = octalParaBinario(inputNumber); break;
-                case 8: resultado = octalParaHexadecimal(inputNumber); break;
-                case 9: resultado = hexadecimalDecimal(inputNumber); break; 
-                case 10: resultado = hexadecimalParaBinário(inputNumber); break;    
-                case 11: resultado = hexadecimalParaOctal(inputNumber); break; 
+            if (erro) {
+                document.getElementById("erro").innerText = erro;
+                document.getElementById("resultado").innerText = '';
+                return;
+            } else {
+                document.getElementById("erro").innerText = '';
+            }
+
+            switch (tipo) {
+                case 0: resultado = decimalParaBinario(input); break;
+                case 1: resultado = decimalParaOctal(parseInt(input)); break;
+                case 2: resultado = decimalParaHexadecimal(parseInt(input)); break;
+                case 3: resultado = binarioParaDecimal(input); break;
+                case 4: resultado = decimalParaOctal(binarioParaDecimal(input)); break;
+                case 5: resultado = decimalParaHexadecimal(binarioParaDecimal(input)); break;
+                case 6: resultado = octalParaDecimal(input); break;
+                case 7: resultado = decimalParaBinario(octalParaDecimal(input)); break;
+                case 8: resultado = decimalParaHexadecimal(octalParaDecimal(input)); break;
+                case 9: resultado = hexadecimalParaDecimal(input); break;
+                case 10: resultado = decimalParaBinario(hexadecimalParaDecimal(input)); break;
+                case 11: resultado = decimalParaOctal(hexadecimalParaDecimal(input)); break;
                 default: resultado = 'Conversão inválida';
             }
 
-            document.getElementById('resultado').innerHTML = 'Resultado: ' + resultado;
-            document.getElementById('resultado').classList.add('show');
+            document.getElementById("resultado").innerText = `Resultado: ${resultado}`;
         }
     </script>
 </body>
